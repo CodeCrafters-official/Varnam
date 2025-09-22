@@ -8,33 +8,55 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Varnam Traditional Color Palette */
+    --background: 48 100% 97%;
+    --foreground: 25 50% 15%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 48 80% 95%;
+    --card-foreground: 25 50% 15%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 48 100% 97%;
+    --popover-foreground: 25 50% 15%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Saffron Orange - Primary brand color */
+    --primary: 24 100% 61%;
+    --primary-foreground: 48 100% 97%;
+    
+    /* Temple Red - Secondary accent */
+    --secondary: 355 70% 55%;
+    --secondary-foreground: 48 100% 97%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Turmeric Gold - Muted elements */
+    --muted: 45 100% 85%;
+    --muted-foreground: 25 50% 35%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Deep Green - Accent color */
+    --accent: 100 60% 35%;
+    --accent-foreground: 48 100% 97%;
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 48 100% 97%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 45 60% 88%;
+    --input: 45 60% 88%;
+    --ring: 24 100% 61%;
+    
+    /* Kolam-specific colors */
+    --kolam-dot: 25 50% 25%;
+    --kolam-line: 355 70% 55%;
+    --kolam-symmetry: 260 100% 70%;
+    --kolam-grid: 45 40% 92%;
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(24 100% 61%), hsl(45 100% 65%));
+    --gradient-secondary: linear-gradient(135deg, hsl(355 70% 55%), hsl(24 100% 61%));
+    --gradient-bg: linear-gradient(180deg, hsl(48 100% 97%), hsl(45 60% 93%));
+
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --shadow-soft: 0 4px 6px -1px hsl(var(--primary) / 0.1), 0 2px 4px -1px hsl(var(--primary) / 0.06);
+    --shadow-medium: 0 10px 15px -3px hsl(var(--primary) / 0.1), 0 4px 6px -2px hsl(var(--primary) / 0.05);
+    --shadow-large: 0 20px 25px -5px hsl(var(--primary) / 0.1), 0 10px 10px -5px hsl(var(--primary) / 0.04);
 
     --radius: 0.5rem;
 
@@ -101,5 +123,47 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Custom animations */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out;
+  }
+
+  .animate-slide-in {
+    animation: slideIn 0.5s ease-out;
+  }
+
+  /* Hover effects */
+  .hover-lift {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-medium);
   }
 }

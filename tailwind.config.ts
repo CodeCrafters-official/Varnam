@@ -57,6 +57,17 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        kolam: {
+          dot: "hsl(var(--kolam-dot))",
+          line: "hsl(var(--kolam-line))",
+          symmetry: "hsl(var(--kolam-symmetry))",
+          grid: "hsl(var(--kolam-grid))",
+        },
+      },
+      backgroundImage: {
+        "gradient-primary": "var(--gradient-primary)",
+        "gradient-secondary": "var(--gradient-secondary)",
+        "gradient-bg": "var(--gradient-bg)",
       },
       borderRadius: {
         lg: "var(--radius)",
