@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Eraser, RotateCcw, Eye, Download } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 interface Point {
   x: number;
@@ -12,6 +13,7 @@ interface KolamCanvasProps {
   gridSize?: number;
   dotSpacing?: number;
   showSymmetry?: boolean;
+  selectedTemplate?: string;
   onPatternComplete?: (pattern: Point[][]) => void;
 }
 
@@ -19,6 +21,7 @@ export const KolamCanvas: React.FC<KolamCanvasProps> = ({
   gridSize = 9,
   dotSpacing = 40,
   showSymmetry = false,
+  selectedTemplate,
   onPatternComplete
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -26,6 +29,85 @@ export const KolamCanvas: React.FC<KolamCanvasProps> = ({
   const [currentPath, setCurrentPath] = useState<Point[]>([]);
   const [allPaths, setAllPaths] = useState<Point[][]>([]);
   const [showSymmetryLines, setShowSymmetryLines] = useState(false);
+  
+  // Load template when selected
+  useEffect(() => {
+    if (selectedTemplate) {
+      loadTemplate(selectedTemplate);
+    }
+  }, [selectedTemplate]);
+
+  const loadTemplate = (templateId: string) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    const width = canvas.width;
+    const height = canvas.height;
+    const centerX = width / 2;
+    const centerY = height / 2;
+    
+    // Clear existing paths
+    setAllPaths([]);
+    setCurrentPath([]);
+    
+    // Define template patterns
+    let templatePaths: Point[][] = [];
+    
+    switch (templateId) {
+      case 'square':
+        templatePaths = [
+          [
+            { x: centerX - 60, y: centerY - 60 },
+            { x: centerX + 60, y: centerY - 60 },
+            { x: centerX + 60, y: centerY + 60 },
+            { x: centerX - 60, y: centerY + 60 },
+            { x: centerX - 60, y: centerY - 60 }
+          ]
+        ];
+        break;
+      case 'flower':
+        // Create flower petal pattern
+        const petals = 6;
+        const radius = 50;
+        for (let i = 0; i < petals; i++) {
+          const angle = (i * 2 * Math.PI) / petals;
+          const nextAngle = ((i + 1) * 2 * Math.PI) / petals;
+          templatePaths.push([
+            { x: centerX, y: centerY },
+            { 
+              x: centerX + Math.cos(angle) * radius, 
+              y: centerY + Math.sin(angle) * radius 
+            },
+            { 
+              x: centerX + Math.cos(nextAngle) * radius, 
+              y: centerY + Math.sin(nextAngle) * radius 
+            },
+            { x: centerX, y: centerY }
+          ]);
+        }
+        break;
+      case 'star':
+        // Create 5-point star
+        const points = 5;
+        const outerRadius = 60;
+        const innerRadius = 25;
+        const starPath: Point[] = [];
+        
+        for (let i = 0; i < points * 2; i++) {
+          const angle = (i * Math.PI) / points - Math.PI / 2;
+          const radius = i % 2 === 0 ? outerRadius : innerRadius;
+          starPath.push({
+            x: centerX + Math.cos(angle) * radius,
+            y: centerY + Math.sin(angle) * radius
+          });
+        }
+        starPath.push(starPath[0]); // Close the star
+        templatePaths = [starPath];
+        break;
+    }
+    
+    setAllPaths(templatePaths);
+  };
 
   const getCanvasPosition = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
@@ -169,21 +251,32 @@ export const KolamCanvas: React.FC<KolamCanvasProps> = ({
   const clearCanvas = () => {
     setAllPaths([]);
     setCurrentPath([]);
-    redrawCanvas();
+    toast.success('Canvas cleared! Ready for a new design.');
   };
 
   const toggleSymmetry = () => {
-    setShowSymmetryLines(!showSymmetryLines);
+    const newSymmetryState = !showSymmetryLines;
+    setShowSymmetryLines(newSymmetryState);
+    toast(newSymmetryState ? 'Symmetry lines shown! Use them to create balanced patterns.' : 'Symmetry lines hidden.');
   };
 
   const downloadKolam = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     
-    const link = document.createElement('a');
-    link.download = 'my-kolam.png';
-    link.href = canvas.toDataURL();
-    link.click();
+    try {
+      const link = document.createElement('a');
+      link.download = `kolam-design-${Date.now()}.png`;
+      link.href = canvas.toDataURL('image/png');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast.success('🎨 Kolam saved successfully!');
+    } catch (error) {
+      console.error('Error saving Kolam:', error);
+      toast.error('Failed to save Kolam. Please try again.');
+    }
   };
 
   return (
