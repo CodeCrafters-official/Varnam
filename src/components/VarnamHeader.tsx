@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Palette, BookOpen, Home } from 'lucide-react';
+import varnamLogo from '@/assets/varnam-logo.png';
 
 interface VarnamHeaderProps {
   currentView: 'home' | 'canvas' | 'learn';
@@ -12,11 +13,12 @@ export const VarnamHeader: React.FC<VarnamHeaderProps> = ({ currentView, onViewC
     <header className="bg-gradient-primary p-4 shadow-lg">
       <div className="max-w-6xl mx-auto flex items-center justify-between">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-            <span className="text-2xl">🪔</span>
-          </div>
+          <img 
+            src={varnamLogo} 
+            alt="Varnam Logo" 
+            className="h-12 w-auto"
+          />
           <div>
-            <h1 className="text-2xl font-bold text-primary-foreground">Varnam</h1>
             <p className="text-sm text-primary-foreground/80">Interactive Kolam Learning</p>
           </div>
         </div>
