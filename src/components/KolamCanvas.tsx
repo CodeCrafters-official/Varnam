@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Eraser, RotateCcw, Eye, Download } from 'lucide-react';
+import { Eraser, RotateCcw, Eye, Download, Sparkles } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 interface Point {
@@ -121,7 +121,7 @@ export const KolamCanvas: React.FC<KolamCanvasProps> = ({
   };
 
   const drawDots = useCallback((ctx: CanvasRenderingContext2D, width: number, height: number) => {
-    ctx.fillStyle = 'hsl(var(--kolam-dot))';
+    ctx.fillStyle = '#8B4513'; // Brown color for dots
     const offsetX = (width - (gridSize - 1) * dotSpacing) / 2;
     const offsetY = (height - (gridSize - 1) * dotSpacing) / 2;
     
@@ -139,7 +139,7 @@ export const KolamCanvas: React.FC<KolamCanvasProps> = ({
   const drawSymmetryLines = useCallback((ctx: CanvasRenderingContext2D, width: number, height: number) => {
     if (!showSymmetryLines) return;
     
-    ctx.strokeStyle = 'hsl(var(--kolam-symmetry))';
+    ctx.strokeStyle = '#9966CC'; // Purple color for symmetry lines
     ctx.lineWidth = 1;
     ctx.setLineDash([5, 5]);
     
@@ -170,7 +170,7 @@ export const KolamCanvas: React.FC<KolamCanvasProps> = ({
   }, [showSymmetryLines]);
 
   const drawPaths = useCallback((ctx: CanvasRenderingContext2D) => {
-    ctx.strokeStyle = 'hsl(var(--kolam-line))';
+    ctx.strokeStyle = '#DC143C'; // Red color for drawn lines
     ctx.lineWidth = 3;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
@@ -209,7 +209,7 @@ export const KolamCanvas: React.FC<KolamCanvasProps> = ({
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
     // Draw background
-    ctx.fillStyle = 'hsl(var(--kolam-grid))';
+    ctx.fillStyle = '#FFF8DC'; // Light cream background
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
     // Draw symmetry lines first (behind everything)
@@ -260,6 +260,103 @@ export const KolamCanvas: React.FC<KolamCanvasProps> = ({
     toast(newSymmetryState ? 'Symmetry lines shown! Use them to create balanced patterns.' : 'Symmetry lines hidden.');
   };
 
+  const generateRandomKolam = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    const width = canvas.width;
+    const height = canvas.height;
+    const centerX = width / 2;
+    const centerY = height / 2;
+    
+    // Clear existing paths
+    setAllPaths([]);
+    setCurrentPath([]);
+    
+    // Generate random patterns
+    const patterns = ['flower', 'star', 'square', 'diamond', 'spiral'];
+    const randomPattern = patterns[Math.floor(Math.random() * patterns.length)];
+    
+    let generatedPaths: Point[][] = [];
+    
+    switch (randomPattern) {
+      case 'flower':
+        const petals = 8;
+        const radius = 60;
+        for (let i = 0; i < petals; i++) {
+          const angle = (i * 2 * Math.PI) / petals;
+          const nextAngle = ((i + 1) * 2 * Math.PI) / petals;
+          generatedPaths.push([
+            { x: centerX, y: centerY },
+            { 
+              x: centerX + Math.cos(angle) * radius, 
+              y: centerY + Math.sin(angle) * radius 
+            },
+            { 
+              x: centerX + Math.cos(nextAngle) * radius, 
+              y: centerY + Math.sin(nextAngle) * radius 
+            }
+          ]);
+        }
+        break;
+      case 'star':
+        const points = 8;
+        const outerRadius = 70;
+        const innerRadius = 30;
+        const starPath: Point[] = [];
+        
+        for (let i = 0; i < points * 2; i++) {
+          const angle = (i * Math.PI) / points - Math.PI / 2;
+          const radius = i % 2 === 0 ? outerRadius : innerRadius;
+          starPath.push({
+            x: centerX + Math.cos(angle) * radius,
+            y: centerY + Math.sin(angle) * radius
+          });
+        }
+        starPath.push(starPath[0]);
+        generatedPaths = [starPath];
+        break;
+      case 'diamond':
+        generatedPaths = [
+          [
+            { x: centerX, y: centerY - 80 },
+            { x: centerX + 60, y: centerY },
+            { x: centerX, y: centerY + 80 },
+            { x: centerX - 60, y: centerY },
+            { x: centerX, y: centerY - 80 }
+          ]
+        ];
+        break;
+      case 'spiral':
+        const spiralPath: Point[] = [];
+        const maxRadius = 80;
+        const turns = 3;
+        for (let i = 0; i <= 100; i++) {
+          const angle = (i / 100) * turns * 2 * Math.PI;
+          const radius = (i / 100) * maxRadius;
+          spiralPath.push({
+            x: centerX + Math.cos(angle) * radius,
+            y: centerY + Math.sin(angle) * radius
+          });
+        }
+        generatedPaths = [spiralPath];
+        break;
+      default: // square
+        generatedPaths = [
+          [
+            { x: centerX - 60, y: centerY - 60 },
+            { x: centerX + 60, y: centerY - 60 },
+            { x: centerX + 60, y: centerY + 60 },
+            { x: centerX - 60, y: centerY + 60 },
+            { x: centerX - 60, y: centerY - 60 }
+          ]
+        ];
+    }
+    
+    setAllPaths(generatedPaths);
+    toast.success(`🎨 Generated a beautiful ${randomPattern} Kolam!`);
+  };
+
   const downloadKolam = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -284,6 +381,14 @@ export const KolamCanvas: React.FC<KolamCanvasProps> = ({
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-semibold">Draw Your Kolam</h3>
         <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={generateRandomKolam}
+          >
+            <Sparkles className="w-4 h-4 mr-1" />
+            Generate
+          </Button>
           <Button
             variant="outline"
             size="sm"
