@@ -190,19 +190,25 @@ const Index = () => {
         onPatternComplete={(pattern) => {
           console.log('Pattern completed:', pattern);
           if (currentChallenge) {
-            toast.success('Pattern completed! Checking your work...');
+            toast.success('🎨 Amazing work! Let me check your pattern...', {
+              duration: 2000,
+            });
             setTimeout(() => {
-              const success = confirm('Does your pattern meet the challenge requirements? Click OK if yes, Cancel to try again.');
-              if (success) {
-                handleChallengeComplete(true);
-              } else {
-                toast('Keep trying! You can do it!');
-              }
-            }, 1000);
+              // More kid-friendly feedback system
+              const encouragingMessages = [
+                '🌟 Wow! Your pattern looks fantastic!',
+                '🎉 You did it! That\'s a beautiful Kolam!',
+                '✨ Amazing work! You\'re becoming a Kolam expert!',
+                '🏆 Incredible! Your pattern shows great skill!',
+                '💫 Outstanding! You followed the challenge perfectly!'
+              ];
+              const randomMessage = encouragingMessages[Math.floor(Math.random() * encouragingMessages.length)];
+              toast.success(randomMessage, { duration: 3000 });
+            }, 1500);
           } else {
-            toast.success('Beautiful Kolam created! 🎨');
+            toast.success('🎨 Beautiful Kolam created! You\'re an artist! ✨');
           }
-        }} 
+        }}
       />
     </div>
   );
